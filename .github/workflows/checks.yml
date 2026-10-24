@@ -1,0 +1,105 @@
+name: checks
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: Node.js version for the test job.
+        type: string
+        default: '22'
+      run:
+        description: Command the test job runs after npm ci. An empty string skips the test job.
+        type: string
+        default: npm run lint && npm run verify
+
+permissions: {}
+
+jobs:
+  test:
+    if: inputs.run != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Run checks
+        env:
+          CHECKS: ${{ inputs.run }}
+        run: eval "$CHECKS"
+      - name: Require committed build output to be fresh
+        run: |
+          if ! git diff --exit-code; then
+            echo "::error::The checks changed tracked files. Run the build and commit its output."
+            exit 1
+          fi
+
+  title:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Require a Conventional Commits title
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          title=$(gh api "repos/$REPO/pulls/$PR" --jq .title)
+          echo "PR title: $title"
+          if ! printf '%s' "$title" | grep -Eq '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^)]+\))?!?: .+'; then
+            echo "::error::Use a Conventional Commits title, for example fix(player): keep the queue order. Edit the title, then re-run this job."
+            exit 1
+          fi
+
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Lint workflow files
+        run: |
+          bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.7/scripts/download-actionlint.bash) 1.7.7
+          ./actionlint -color
+
+  zizmor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
+        with:
+          advanced-security: false
+
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: trufflesecurity/trufflehog@c85580b712841eda4c53bc28fc6ace6100e8c16c # v3.99.4
+        with:
+          base: ${{ github.event.pull_request.base.sha || github.event.before }}
+          head: ${{ github.event.pull_request.head.sha || github.sha }}
+          extra_args: --results=verified,unknown
