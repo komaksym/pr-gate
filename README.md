@@ -22,6 +22,7 @@ name: pr
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, edited]
   push:
     branches: [main]
 
