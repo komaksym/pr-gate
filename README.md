@@ -91,6 +91,18 @@ Then run `./apply-ruleset.sh OWNER/REPO`. It creates or updates the `pr-gate` ru
 
 The script lists other active rulesets. Disable any that still require old checks.
 
+### Enforce checks on stacked pull requests
+
+Use a GitHub stack. GitHub evaluates required reviews, status checks, CODEOWNERS, and Actions for every stack layer against the stack trunk. When the trunk is the default branch, the `pr-gate` ruleset on that branch requires `gate` for every layer. For a stack rooted at another branch, apply an equivalent ruleset to that trunk.
+
+Create a stack with `gh stack`, or link existing pull requests with `gh stack link`. Pass the pull requests from bottom to top.
+
+    gh stack link 41 42
+
+GitHub shows how to create and link stacks in [Stacked pull requests](https://docs.github.com/en/pull-requests/reference/stacked-pull-requests).
+
+Do not add `required_status_checks` to a ruleset that targets feature branches. GitHub checks that rule before every branch update. A new commit would need `gate` before the push that starts CI, so developers could not update the branch.
+
 ### Require Codecov patch coverage
 
 Use this option when the repository uploads coverage and must block a PR that misses its patch target.

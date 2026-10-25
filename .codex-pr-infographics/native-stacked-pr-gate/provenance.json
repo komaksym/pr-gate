@@ -1,0 +1,9 @@
+{
+  "skill": "baoyu-infographic",
+  "backend": "codex-imagegen",
+  "image_sha256": "5a5e38e3d2e4fe2ec7677bfa5755f48bbb6774f00a20c38d653a800888ceb4d8",
+  "prompt_sha256": "84ec06fdc3ee1220dcdf383aca5e82bae9ad9158d8c47ca65c59dccf2aa0166d",
+  "purpose": "The infographic shows why native GitHub stacks inherit the trunk gate and why feature-branch required checks block updates.",
+  "visual_note": "The title reads NATIVE STACKS USE THE TRUNK GATE, and the action band shows gh stack link 41 42.",
+  "created_at": "2026-10-25T16:55:13Z"
+}
