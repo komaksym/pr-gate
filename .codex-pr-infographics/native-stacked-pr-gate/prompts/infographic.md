@@ -1,3 +1,12 @@
+---
+references:
+  - ref_id: 01
+    filename: refs/01-ref-native-stacked-pr-gate.png
+    usage: direct
+---
+
+Use the referenced infographic as the composition and style reference. Render a fresh, faithful version with the exact text below. Do not copy the reference bytes.
+
 Create a professional English infographic in landscape 16:9. Use structural-breakdown layout with technical-schematic styling. Opaque light gray canvas, visible navy border, high-contrast navy typography, restrained teal and red accents, and generous whitespace.
 
 Title: "NATIVE STACKS USE THE TRUNK GATE"
