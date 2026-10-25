@@ -93,7 +93,7 @@ The script lists other active rulesets. Disable any that still require old check
 
 ### Enforce checks on stacked pull requests
 
-Use a GitHub stack. GitHub evaluates required reviews, status checks, CODEOWNERS, and Actions for every stack layer against the stack trunk. The `pr-gate` ruleset on the default branch therefore requires `gate` for every layer.
+Use a GitHub stack. GitHub evaluates required reviews, status checks, CODEOWNERS, and Actions for every stack layer against the stack trunk. When the trunk is the default branch, the `pr-gate` ruleset on that branch requires `gate` for every layer. For a stack rooted at another branch, apply an equivalent ruleset to that trunk.
 
 Create a stack with `gh stack`, or link existing pull requests with `gh stack link`. Pass the pull requests from bottom to top.
 
