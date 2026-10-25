@@ -2,6 +2,23 @@
 
 One required check, `gate`, for every repository.
 
+## PR infographic policy for every maintained repository
+
+The shared `pr-visual.yml` workflow validates current PR descriptions and PNG bytes at the PR head. It never checks out contributor code. Body edits trigger the caller, and re-runs fetch the latest description. Bots and forks use the same policy. An image URL alone is insufficient. The file must exist on the head branch or commit and contain a PNG signature.
+
+Run the fleet installer with a full published pr-gate commit and a generated infographic:
+
+```sh
+python3 adopt-pr-visual.py --pin COMMIT_SHA --image infographic.png --report /tmp/pr-visual-coverage.jsonl
+python3 adopt-pr-visual.py --pin COMMIT_SHA --image infographic.png --report /tmp/pr-visual-coverage.jsonl --apply
+```
+
+With no `--repo`, it enumerates all repositories where the authenticated account has admin or maintain access, including forks and private repositories. Archived repositories are reported as read-only. `--repo OWNER/REPO` limits the operation. Existing files and branches are checked before writing, making repeat runs safe.
+
+Every adoption PR includes a caller pinned to the shared commit and an infographic. Merge adoption PRs through normal review. Then run again with `--apply --arm`. Arming requires the caller on the default branch and a successful GitHub Actions visual check. The installer adds a separate `pr-infographic` ruleset, preserving existing checks. Unsupported plans and access failures remain explicit coverage gaps. No repository changes visibility or billing.
+
+GitHub has no personal-account setting that installs this workflow on future repositories automatically. Run the same installer during repository creation and periodically to detect new maintained repositories. An open adoption PR is pending coverage, never enforced coverage.
+
 ## What runs
 
 `checks.yml` is a reusable workflow. It runs these jobs in parallel:

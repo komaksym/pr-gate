@@ -1,0 +1,48 @@
+name: PR infographic
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  infographic:
+    name: pr-visual
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const number = context.payload.pull_request?.number;
+            if (!number) { core.setFailed('PR infographic check requires a pull request event.'); return; }
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: number });
+            const head = pr.head;
+            const body = (pr.body || '').replace(/<!--[\s\S]*?-->/g, '').replace(/^\s*(```|~~~)[\s\S]*?^\s*\1.*$/gm, '');
+            const png = Buffer.from('89504e470d0a1a0a', 'hex');
+            for (const match of body.matchAll(/!\[[^\]]*\]\((https:\/\/[^\s)]+)\)/g)) {
+              let url;
+              try { url = new URL(match[1]); } catch { continue; }
+              if (url.hostname !== 'github.com' || url.searchParams.get('raw') !== 'true') continue;
+              const prefix = `/${head.repo.full_name}/blob/`;
+              const path = decodeURIComponent(url.pathname);
+              if (!path.startsWith(prefix)) continue;
+              const rest = path.slice(prefix.length);
+              const ref = [head.ref, head.sha].find(ref => rest.startsWith(`${ref}/`));
+              if (!ref) continue;
+              const file = rest.slice(ref.length + 1);
+              if (!file.toLowerCase().endsWith('.png')) continue;
+              try {
+                const [headOwner, headRepo] = head.repo.full_name.split('/');
+                const { data } = await github.rest.repos.getContent({ owner: headOwner, repo: headRepo, path: file, ref: head.sha });
+                if (data.type !== 'file' || data.encoding !== 'base64') continue;
+                if (!Buffer.from(data.content, 'base64').subarray(0, 8).equals(png)) continue;
+                core.info(`PR infographic found at ${head.sha}:${file}`);
+                return;
+              } catch (error) { core.info(`Cannot read infographic: ${error.message}`); }
+            }
+            core.setFailed('NO_PR_VISUAL: commit an infographic PNG to the PR head and embed ![Infographic](https://github.com/OWNER/REPO/blob/HEAD/path/infographic.png?raw=true) in the PR body.');
