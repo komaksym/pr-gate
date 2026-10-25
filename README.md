@@ -22,7 +22,7 @@ name: pr
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, edited]
+    types: [opened, synchronize, reopened]
   push:
     branches: [main]
 
@@ -52,6 +52,35 @@ jobs:
 ```
 
 Add every repository job to `needs`. Pin the commit SHA. Dependabot updates the pin.
+
+Skip `edited`. A description edit would rerun every job and cancel the run in progress. The `title` job reads the live title, so after you fix a title, re-run that job.
+
+For a repository without npm, pass `run: ''` to skip the `test` job, and add your own test job to `needs`:
+
+```yaml
+  checks:
+    uses: komaksym/pr-gate/.github/workflows/checks.yml@<commit sha> # v1
+    with:
+      run: ''
+    permissions:
+      contents: read
+      pull-requests: read
+
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@<commit sha> # v4
+        with:
+          persist-credentials: false
+      - run: <your test command>
+
+  gate:
+    if: always()
+    needs: [checks, test]
+    # same steps as above
+```
 
 Then run `./apply-ruleset.sh OWNER/REPO`. It creates or updates the `pr-gate` ruleset on the default branch:
 
