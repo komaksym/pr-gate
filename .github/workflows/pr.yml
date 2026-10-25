@@ -2,7 +2,7 @@ name: pr
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, edited]
   push:
     branches: [main]
 
@@ -34,6 +34,7 @@ jobs:
       - run: bash -n apply-ruleset.sh
       - run: bash -n apply-codecov-ruleset.sh
       - run: python3 -m unittest discover -s tests -v
+      - run: node --test tests/test_pr_visual.cjs
       - run: jq -e '.rules[] | select(.type == "required_status_checks") | .parameters.required_status_checks[] | select(.context == "gate")' ruleset.json
       - run: |
           jq -e '.name == "pr-gate-codecov" and (.rules | length == 1) and .rules[0].parameters.required_status_checks == [{"context": "codecov/patch"}]' codecov-ruleset.json

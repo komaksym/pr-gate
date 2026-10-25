@@ -1,0 +1,9 @@
+{
+  "skill": "baoyu-infographic",
+  "backend": "codex-imagegen",
+  "image_sha256": "38a8d3db4ebb33c633717ea2684126546b0ed3409f63267c2917c7b59eb6da7c",
+  "prompt_sha256": "4b74fcc7b9e532c92fe8dff85de038aa78513f57ff639a9e033773014052084f",
+  "purpose": "One shared validator serves every maintained repository through pinned workflows and required GitHub checks.",
+  "visual_note": "I read \"One PR infographic policy\", \"Shared validator in pr-gate\", \"Pinned caller in each maintained repo\", and \"Adoption PR open = pending\".",
+  "created_at": "2026-10-25T22:25:08.760283+00:00"
+}
