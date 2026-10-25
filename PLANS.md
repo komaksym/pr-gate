@@ -17,3 +17,16 @@ Support a required `codecov/patch` check for repositories that upload coverage. 
 - Independent workstreams. This checkout owns shared ruleset support. PRC coverage uses its own checkout.
 - Shared mutable state. Only the parent writes live repository rulesets.
 - Smallest safe decomposition. Keep the default ruleset unchanged and add one explicit Codecov option.
+
+## Stacked pull request gate
+
+### Summary
+
+Use GitHub native stacks. GitHub evaluates every layer against the stack trunk, so the existing default-branch `pr-gate` ruleset covers the whole chain. Do not put required status checks on feature branches, because GitHub also enforces them before branch updates.
+
+### Milestones
+
+- [x] Prove that `pr-gate-stacked` rejects a new commit before its `gate` check can run.
+- [x] Delete the active `pr-gate-stacked` ruleset from `komaksym/prc`.
+- [x] Document native stacks and the bottom-to-top `gh stack link` command.
+- [ ] Link existing PRC chains after each chain has a bottom pull request against `main`.
