@@ -1,0 +1,9 @@
+{
+  "skill": "baoyu-infographic",
+  "backend": "codex-imagegen",
+  "image_sha256": "772d128780570c3086737fefbe35429ce55b213599975a12777b9fc166eb4722",
+  "prompt_sha256": "df2501b06ca3c33a8d4cbbd91c3f5308a4d661fdef18e611f44de743acbc6419",
+  "purpose": "Coverage reports and a verified Codecov status protect changed code in both repositories.",
+  "visual_note": "I saw \"Codecov merge protection\", \"Changed lines: 80%\", \"Overall coverage: informational\", and \"Require codecov/patch only after a real status appears\". All labels are legible inside the canvas.",
+  "created_at": "2026-10-25T13:10:53.344350+00:00"
+}

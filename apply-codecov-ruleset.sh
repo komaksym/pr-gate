@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Create or update the opt-in Codecov ruleset after a genuine patch check passes.
-# Usage: apply-codecov-ruleset.sh OWNER/REPO PR_NUMBER
 set -euo pipefail
 
 readonly usage="usage: apply-codecov-ruleset.sh OWNER/REPO PR_NUMBER"
