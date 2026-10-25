@@ -24,6 +24,7 @@ def check(codecov=True, status="completed", conclusion="success", head=HEAD):
         app = {"slug": "github-actions", "id": 15368}
         name = "gate"
     return {
+        "id": 1,
         "name": name,
         "status": status,
         "conclusion": conclusion,
@@ -173,6 +174,21 @@ class CodecovRulesetTest(unittest.TestCase):
 
     def test_rejects_failed_check_without_write(self):
         self.state["checks"][0] = check(conclusion="failure")
+        self.run_script("owner/repo", "7")
+        self.assert_rejected_without_writes("successful")
+
+    def test_successful_retry_supersedes_an_older_failure(self):
+        older = check(conclusion="failure")
+        newer = {**check(), "id": 2}
+        self.state["checks"] = [newer, older]
+        self.run_script("owner/repo", "7")
+        self.assertEqual(self.last.returncode, 0, self.last.stderr)
+        self.assertEqual(len(self.state["writes"]), 1)
+
+    def test_failed_retry_cannot_use_an_older_success(self):
+        older = check()
+        newer = {**check(conclusion="failure"), "id": 2}
+        self.state["checks"] = [newer, older]
         self.run_script("owner/repo", "7")
         self.assert_rejected_without_writes("successful")
 

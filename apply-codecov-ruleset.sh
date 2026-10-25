@@ -142,7 +142,8 @@ check_pages="$(read_api \
   --paginate)"
 checks="$(jq -sc '[.[] | (.check_runs // [])[]]' <<< "$check_pages")"
 matching_checks="$(jq -c --arg name "$check_name" \
-  '[.[] | select(.name == $name)]' <<< "$checks")"
+  '[.[] | select(.name == $name)]
+   | if length == 0 then [] else [max_by(.id)] end' <<< "$checks")"
 
 if [[ "$(jq 'length' <<< "$matching_checks")" -eq 0 ]]; then
   die "no $check_name check was found on the PR head"
