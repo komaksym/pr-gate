@@ -1,0 +1,14 @@
+name: PR infographic
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+jobs:
+  visual:
+    uses: komaksym/pr-gate/.github/workflows/pr-visual.yml@8b81224feca1730fd5d0747f6e4f421d790bb86a
+    permissions:
+      contents: read
+      pull-requests: read
