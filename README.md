@@ -91,6 +91,18 @@ Then run `./apply-ruleset.sh OWNER/REPO`. It creates or updates the `pr-gate` ru
 
 The script lists other active rulesets. Disable any that still require old checks.
 
+### Require Codecov patch coverage
+
+Use this option when the repository uploads coverage and must block a PR that misses its patch target.
+
+Install the Codecov GitHub App. Push the PR so Codecov reports `codecov/patch` on the current head. Then run:
+
+    ./apply-codecov-ruleset.sh OWNER/REPO PR_NUMBER
+
+The PR must target the default branch. The script reads the repository default branch, PR base, and PR head. It reads the canonical Codecov app ID from `gh api apps/codecov`. It accepts only a completed successful `codecov/patch` run from that app on the PR head. It checks the PR head again immediately before a write. If the PR base or head changes, the script writes nothing.
+
+The script creates or updates one dedicated active ruleset, `pr-gate-codecov`. The ruleset requires `codecov/patch` from the canonical Codecov app on the default branch. It has no bypass actors. The script leaves `pr-gate` and all other rulesets unchanged. An exact existing ruleset causes no write. Running `./apply-ruleset.sh OWNER/REPO` later keeps the Codecov ruleset. The script has no delete path. To stop requiring `codecov/patch`, explicitly delete the `pr-gate-codecov` ruleset in GitHub.
+
 ## Rules that keep the gate honest
 
 - `gate` uses `if: always()`. Without it, a failed job skips `gate`, and GitHub treats a skipped check as passing.
